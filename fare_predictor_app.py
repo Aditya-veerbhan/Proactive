@@ -23,6 +23,21 @@ def predict_optimal_fare(current_fare, occupancy, market_fare_min, market_fare_m
 
     return round(suggested_price, 2), confidence, reason
 
+def generate_operator_blurb(current_fare, suggested_fare, occupancy, demand_percentile):
+    change = round(suggested_fare - current_fare, 2)
+    direction = "increase" if change > 0 else "decrease"
+    blurb = (
+        f"Dear Operator,\n\n"
+        f"Based on current occupancy levels of {occupancy}% and a demand percentile of {demand_percentile}%, "
+        f"our pricing model recommends a fare {direction} from ₹{current_fare} to ₹{suggested_fare}.\n\n"
+        f"This adjustment is expected to optimize seat fill and improve revenue per service. "
+        f"Our model considers market trends and real-time demand to ensure pricing aligns with competitor benchmarks "
+        f"while maximizing your earnings.\n\n"
+        f"We recommend applying this change proactively to capture upcoming demand.\n\n"
+        f"Regards,\nPricing Intelligence Team"
+    )
+    return blurb
+
 # Streamlit UI
 st.set_page_config(page_title="Bus Fare Predictor", layout="centered")
 st.title("🚌 Optimal Bus Fare Predictor")
@@ -42,3 +57,7 @@ if submitted:
     st.success(f"🔧 Suggested Fare: ₹{fare}")
     st.info(f"✅ Confidence Level: {confidence}")
     st.warning(f"📌 Reason: {reason}")
+
+    blurb = generate_operator_blurb(current_fare, fare, occupancy, demand_percentile)
+    st.markdown("### 🧾 Communication Blurb to Bus Operator")
+    st.code(blurb)
